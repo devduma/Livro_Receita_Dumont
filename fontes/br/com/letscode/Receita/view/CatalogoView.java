@@ -95,11 +95,12 @@ public class CatalogoView {
 
         Receita receita = informaReceita();
         if (receita != null) {
+            // lê informações de rendimento
             Rendimento rendimento = informaRendimento();
             receita.setRendimento(rendimento);
 
+            // Inclusão de ingredientes
             String adiciona;
-
             List<Ingrediente> ingredientes = new ArrayList<>();
             do{
                 ingredientes.add(informaIngredientes());
@@ -118,7 +119,7 @@ public class CatalogoView {
 
             receita.setPreparo(preparo);
 
-            //Cria uma nova receita no catálogo e torna essa a ativa.
+            // Cria uma nova receita no catálogo e torna essa a ativa caso not null.
             Receita nova = new EditReceitaView(receita).edit();
             if (nova != null) {
                 controller.add(nova);
@@ -128,6 +129,7 @@ public class CatalogoView {
         }
     }
 
+    /** Informações básicas da receita: nome da receita, categoria e tempo de preparo */
     private Receita informaReceita() {
         String nomeReceita = ConsoleUtils.getUserInput("Nome da nova receita");
         Receita other = null;
@@ -158,6 +160,7 @@ public class CatalogoView {
                 boolean argumentoOK = false;
                 double tempoPreparo = 0d;
 
+                // lê tempo de preparo
                 while (!argumentoOK){
                     String tempoPreparoStr = ConsoleUtils.getUserInput("Tempo de preparo (minutos)");
                     try {
@@ -185,10 +188,11 @@ public class CatalogoView {
         }
 
         String catgReceita = ConsoleUtils.getUserOption("%nEscolha a opção", options);
-        System.out.println("Categoria: " + categorias[buscaPosicaoCategoria(catgReceita)].name());
-        return categorias[buscaPosicaoCategoria(catgReceita)];
+        System.out.println("Categoria: " + categorias[buscaPosicaoCategoria(catgReceita,categorias)].name());
+        return categorias[buscaPosicaoCategoria(catgReceita, categorias)];
     }
 
+    /** Trata informações de Rendimento: quantidades De e Até e unidade/tipo */
     public Rendimento informaRendimento() {
         int qdeDe = (int) validaQuantidade("Serve: De (quantidade)");
 
@@ -205,13 +209,14 @@ public class CatalogoView {
         }
 
         String tipo = ConsoleUtils.getUserOption("%nEscolha a opção", options);
-        int posicao = buscaPosicaoTipo(Integer.parseInt(tipo));
+        int posicao = buscaPosicaoTipo(Integer.parseInt(tipo), tipos);
         System.out.println("Tipo: " + tipos[posicao].name());
 
 
         return new Rendimento(qdeDe, qdeAte, tipos[posicao]);
     }
 
+    /** trata informações de Ingredientes: Nome, quantidade e unidade */
     public Ingrediente informaIngredientes(){
         String nomeIngrediente;
         do{
@@ -231,7 +236,7 @@ public class CatalogoView {
         }
 
         String tipo = ConsoleUtils.getUserOption("%nEscolha a opção", options);
-        int posicao = buscaPosicaoMedida(Integer.parseInt(tipo));
+        int posicao = buscaPosicaoMedida(Integer.parseInt(tipo), tipos);
         System.out.println("Medida: " + tipos[posicao].name());
 
         return new Ingrediente(nomeIngrediente, qdeIngrediente, tipos[posicao]);
@@ -299,12 +304,18 @@ public class CatalogoView {
             controller.add(nova);
             //Torna a nova receita a ativa.
             ative = nova;
-            numReceitaAtual = 0;
         }
     }
 
-    private int buscaPosicaoCategoria(String idCategoria){
-        Categoria[] categoria = Categoria.values();
+    public void view() {
+        do {
+            //Exibe o layout montado.
+            new ReceitaView(ative).fullView(System.out);
+            //Exibe o menu de opções.
+        } while (showMenu());
+    }
+
+    private int buscaPosicaoCategoria(String idCategoria, Categoria[] categoria){
         int posicao = -1;
         for (int i = 0; i < Categoria.values().length; i++) {
             if ((categoria[i].getCategoria()).equalsIgnoreCase(idCategoria)) {
@@ -315,8 +326,7 @@ public class CatalogoView {
         return posicao;
     }
 
-    private static int buscaPosicaoTipo(int idTipo){
-        TipoRendimento[] tipo = TipoRendimento.values();
+    private static int buscaPosicaoTipo(int idTipo, TipoRendimento[] tipo){
         int posicao = -1;
         for (int i = 0; i < TipoRendimento.values().length; i++) {
             if (tipo[i].getTipo() == idTipo) {
@@ -327,8 +337,7 @@ public class CatalogoView {
         return posicao;
     }
 
-    private static int buscaPosicaoMedida(int idTipo) {
-        TipoMedida[] tipo = TipoMedida.values();
+    private static int buscaPosicaoMedida(int idTipo, TipoMedida[] tipo) {
         int posicao = -1;
         for (int i = 0; i < TipoMedida.values().length; i++) {
             if (tipo[i].getMedida() == idTipo) {
@@ -337,14 +346,6 @@ public class CatalogoView {
             }
         }
         return posicao;
-    }
-
-    public void view() {
-        do {
-            //Exibe o layout montado.
-            new ReceitaView(ative).fullView(System.out);
-            //Exibe o menu de opções.
-        } while (showMenu());
     }
 
     private static double validaQuantidade(String mensagem){

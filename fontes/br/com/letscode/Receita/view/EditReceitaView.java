@@ -124,6 +124,7 @@ public class EditReceitaView {
         receita.setRendimento(rendimento);
     }
 
+    // menu de ingredientes: adição ou remoção de ingredientes
     private void ingrediente(){
         new ReceitaView(receita).ingredientesView(System.out);
         String opcao = ConsoleUtils.getUserOption("Adicionar (+) / Remover (-) / Sair (S)?%n", "+", "-", "S");
@@ -175,9 +176,10 @@ public class EditReceitaView {
             adiciona = ConsoleUtils.getUserOption("Deseja excluir um outro ingrediente?\nS - Sim   N - Não", "S", "N");
         } while (adiciona.equalsIgnoreCase("S"));
 
-        receita.excluiIngredientes(ingredientes); // exclui todos os ingredientes da lista
+        receita.excluiIngredientes(ingredientes); // exclui todos os ingredientes da lista 'ingredientes'
     }
 
+    /* valida o número informado pelo usuário na sequência de ingredientes da receita */
     private int validaIdIngrediente(String mensagem){
         boolean argumentoOK = false;
         int index = 0;
@@ -200,6 +202,7 @@ public class EditReceitaView {
         return index;
     }
 
+    /* menu de Edição do Preparo: inclusão ou exclusão de uma linha detalhe do preparo */
     private void preparo(){
         new ReceitaView(receita).preparoView(System.out);
         String opcao = ConsoleUtils.getUserOption("Adicionar (+) / Remover (-) / Sair (S)?%n", "+", "-", "S");
