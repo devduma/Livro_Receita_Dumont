@@ -172,7 +172,7 @@ public class EditReceitaView {
                 }
                 seq++;
             }
-            adiciona = ConsoleUtils.getUserOption("Deseja excluir um novo ingrediente?\nS - Sim   N - Não", "S", "N");
+            adiciona = ConsoleUtils.getUserOption("Deseja excluir um outro ingrediente?\nS - Sim   N - Não", "S", "N");
         } while (adiciona.equalsIgnoreCase("S"));
 
         receita.excluiIngredientes(ingredientes); // exclui todos os ingredientes da lista
@@ -229,10 +229,11 @@ public class EditReceitaView {
         while (!linhaPreparo.isBlank()) {
             if (receita.getPreparo().size() > 0) {
                 numLinha = validaLinhaPreparo("Informe a linha onde o detalhe será inserido", receita.getPreparo().size()+1);
+                numLinha--;
             }
-            receita.getPreparo().add(numLinha - 1,linhaPreparo); // inclui detalhe na posição da lista numLinha-1
+            receita.getPreparo().add(numLinha,linhaPreparo); // inclui detalhe na posição da lista numLinha-1
             new ReceitaView(receita).preparoView(System.out);
-            linhaPreparo = ConsoleUtils.getUserInput("Detalhe do preparo a ser incluído. Para sair, tecle <ENTER>");
+            linhaPreparo = ConsoleUtils.getUserInput("\nDetalhe do preparo a ser incluído. Para sair, tecle <ENTER>");
         }
     }
 
@@ -263,13 +264,19 @@ public class EditReceitaView {
         String exclui = "S";
 
         while (exclui.equalsIgnoreCase("S")) {
+
             numLinha = validaLinhaPreparo("Informe a linha a ser excluída do preparo da receita."
                     ,receita.getPreparo().size());
             if (receita.getPreparo().size() > 0) {
                 receita.getPreparo().remove(numLinha - 1); // exclui detalhe na posição da lista numLinha-1
             }
             new ReceitaView(receita).preparoView(System.out);
-            exclui = ConsoleUtils.getUserOption("Deseja continuar excluindo?\nS - Sim   N - Não", "S", "N");
+            if (receita.getPreparo().size() == 0){
+                exclui = "N";
+            }
+            else {
+                exclui = ConsoleUtils.getUserOption("Deseja continuar excluindo?\nS - Sim   N - Não", "S", "N");
+            }
         }
     }
 }

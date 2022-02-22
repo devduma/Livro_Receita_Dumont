@@ -140,6 +140,13 @@ public class CatalogoView {
                 //Se confirmar, ativa receita com o nome digitado
                 if (opcao.equalsIgnoreCase("S")) {
                     Receita nova = new EditReceitaView(other).edit();
+                    if (nova != null) {
+                        controller.del(ative.getNome());
+                        controller.add(nova);
+                        //Torna a nova receita a ativa.
+                        ative = nova;
+                        numReceitaAtual = 0;
+                    }
                 }
                 other = null;
             }
@@ -183,7 +190,9 @@ public class CatalogoView {
     }
 
     public Rendimento informaRendimento() {
-        int qdeRendimento = (int) validaQuantidade("Rendimento (quantidade)");
+        int qdeDe = (int) validaQuantidade("Serve: De (quantidade)");
+
+        int qdeAte = (int) validaQuantidade("Até");
 
         // Tipo Rendimento
         System.out.println("Unidade Rendimento: ");
@@ -199,7 +208,8 @@ public class CatalogoView {
         int posicao = buscaPosicaoTipo(Integer.parseInt(tipo));
         System.out.println("Tipo: " + tipos[posicao].name());
 
-        return new Rendimento(qdeRendimento, tipos[posicao]);
+
+        return new Rendimento(qdeDe, qdeAte, tipos[posicao]);
     }
 
     public Ingrediente informaIngredientes(){
