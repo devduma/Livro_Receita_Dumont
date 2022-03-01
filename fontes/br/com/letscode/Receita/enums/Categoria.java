@@ -14,5 +14,15 @@ public enum Categoria {
     public String getCategoria() {
         return idCatg;
     }
+
+    public static Categoria identificaCategoriaSelecionada(String idCategoria){
+        for (Categoria origem : Categoria.values()) {
+            if (origem.getCategoria().equalsIgnoreCase(idCategoria)) {
+                return origem;
+            }
+        }
+        return null;
+    }
 }
+
 

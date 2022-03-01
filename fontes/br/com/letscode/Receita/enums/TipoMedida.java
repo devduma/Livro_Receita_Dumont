@@ -23,4 +23,14 @@ public enum TipoMedida {
     public int getMedida() {
         return this.idMedida;
     }
+
+    public static TipoMedida identificaUnidadeMedidaSelecionado(int idMedida){
+        for (TipoMedida origem : TipoMedida.values()) {
+            if (origem.getMedida() ==  idMedida) {
+                return origem;
+            }
+        }
+        return null;
+    }
+
 }

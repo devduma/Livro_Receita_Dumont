@@ -5,6 +5,8 @@ import br.com.letscode.Receita.domain.Ingrediente;
 import br.com.letscode.Receita.domain.Receita;
 import br.com.letscode.Receita.domain.Rendimento;
 import br.com.letscode.Receita.enums.Categoria;
+import br.com.letscode.Receita.enums.TipoMedida;
+import br.com.letscode.Receita.enums.TipoRendimento;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +17,10 @@ public class EditReceitaView {
 
     public EditReceitaView(Receita receita) {
         this.receita = new Receita(receita);
+    }
+
+    public EditReceitaView(){
+        this.receita = null;
     }
 
     public Receita edit() {
@@ -96,12 +102,33 @@ public class EditReceitaView {
 
     private void categoria(){
         System.out.println("Nova categoria ");
-        Categoria categoria = new CatalogoView().validaCategoria();
+        Categoria categoria = validaCategoria();
 
         receita.setCategoria(categoria);
     }
 
+    public Categoria validaCategoria(){
+        System.out.println("Categoria da receita: ");
+        Categoria[] categorias = Categoria.values();
+        String[] options = new String[categorias.length];
+
+        for (int i = 0; i < categorias.length; i++) {
+            options[i] = categorias[i].getCategoria();
+            System.out.printf("%s - %s%n", categorias[i].getCategoria(), categorias[i].name());
+        }
+
+        String catgReceita = ConsoleUtils.getUserOption("%nEscolha a opção", options);
+        Categoria nomeCategoria = Categoria.identificaCategoriaSelecionada(catgReceita);
+        System.out.println("Categoria: " + nomeCategoria);
+        return nomeCategoria;
+    }
+
     private void tempoPreparo(){
+        double tempoPreparo = validaTempoPreparo();
+        receita.setTempoPreparo(tempoPreparo);
+    }
+
+    public double validaTempoPreparo(){
         // Edita Tempo de preparo
         boolean argumentoOK = false;
         double tempoPreparo = 0d;
@@ -116,12 +143,88 @@ public class EditReceitaView {
                 System.out.println("Valor inválido");
             }
         }
-        receita.setTempoPreparo(tempoPreparo);
+        return tempoPreparo;
     }
 
-    private void rendimento() {
-        Rendimento rendimento = new CatalogoView().informaRendimento();
+    public void rendimento() {
+        Rendimento rendimento = informaRendimento();
         receita.setRendimento(rendimento);
+    }
+
+    /** Trata informações de Rendimento: quantidades De e Até e unidade/tipo */
+    private Rendimento informaRendimento() {
+        int qdeDe = (int) validaQuantidade("Serve: De (quantidade)");
+
+        int qdeAte = (int) validaQuantidade("Até");
+
+        // Tipo Rendimento
+        System.out.println("Unidade Rendimento: ");
+        TipoRendimento[] tipos = TipoRendimento.values();
+        String[] options = new String[tipos.length];
+
+        for (int i = 0; i < tipos.length; i++) {
+            options[i] = String.valueOf(tipos[i].getTipo());
+            System.out.printf("%s - %s%n", tipos[i].getTipo(), tipos[i].name());
+        }
+
+        String tipo = ConsoleUtils.getUserOption("%nEscolha a opção", options);
+        TipoRendimento nomeTipo = TipoRendimento.identificaTipoRendimentoSelecionado(Integer.parseInt(tipo));
+        System.out.println("Tipo: " + nomeTipo);
+
+        return new Rendimento(qdeDe, qdeAte, nomeTipo);
+    }
+
+    private static int buscaPosicaoMedida(int idTipo, TipoMedida[] tipo) {
+        int posicao = -1;
+        for (int i = 0; i < TipoMedida.values().length; i++) {
+            if (tipo[i].getMedida() == idTipo) {
+                posicao = i;
+                break;
+            }
+        }
+        return posicao;
+    }
+
+    private static double validaQuantidade(String mensagem){
+        boolean argumentoOK = false;
+        double qde = 0;
+
+        while (!argumentoOK) {
+            String qdeStr = ConsoleUtils.getUserInput(mensagem);
+            try {
+                qde = Double.parseDouble(qdeStr);
+                argumentoOK = true;
+            } catch (NumberFormatException e) {
+                System.out.println("Valor inválido");
+            }
+        }
+        return qde;
+    }
+
+    /** trata informações de Ingredientes: Nome, quantidade e unidade */
+    public Ingrediente informaIngredientes(){
+        String nomeIngrediente;
+        do{
+            nomeIngrediente = ConsoleUtils.getUserInput("Nome do Ingrediente");
+        } while (nomeIngrediente.isBlank());
+
+        double qdeIngrediente = validaQuantidade("Quantidade");
+
+        // Unidade de Medida
+        System.out.println("Unidade Medida: ");
+        TipoMedida[] tipos = TipoMedida.values();
+        String[] options = new String[tipos.length];
+
+        for (int i = 0; i < tipos.length; i++) {
+            options[i] = String.valueOf(tipos[i].getMedida());
+            System.out.printf("%s - %s%n", tipos[i].getMedida(), tipos[i].name());
+        }
+
+        String tipo = ConsoleUtils.getUserOption("%nEscolha a opção", options);
+        TipoMedida unidadeMedida = TipoMedida.identificaUnidadeMedidaSelecionado(Integer.parseInt(tipo));
+        System.out.println("Medida: " + unidadeMedida);
+
+        return new Ingrediente(nomeIngrediente, qdeIngrediente, unidadeMedida);
     }
 
     // menu de ingredientes: adição ou remoção de ingredientes
@@ -151,7 +254,7 @@ public class EditReceitaView {
 
         List<Ingrediente> ingredientes = new ArrayList<>();
         do{
-            ingredientes.add(new CatalogoView().informaIngredientes());
+            ingredientes.add(informaIngredientes());
             adiciona = ConsoleUtils.getUserOption("Deseja adicionar um novo ingrediente?\nS - Sim   N - Não", "S", "N");
         } while (adiciona.equalsIgnoreCase("S"));
 

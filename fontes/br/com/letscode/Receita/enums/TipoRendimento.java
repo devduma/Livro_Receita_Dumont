@@ -21,4 +21,13 @@ public enum TipoRendimento {
     public int getTipo() {
         return this.idTipo;
     }
+
+    public static TipoRendimento identificaTipoRendimentoSelecionado(int idTipo){
+        for (TipoRendimento origem : TipoRendimento.values()) {
+            if (origem.getTipo() ==  idTipo) {
+                return origem;
+            }
+        }
+        return null;
+    }
 }

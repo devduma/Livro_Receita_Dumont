@@ -22,6 +22,8 @@ public class Receita {
         this.nome = nome;
         this.categoria = categoria;
         this.tempoPreparo = tempoPreparo;
+        this.ingredientes=new ArrayList<>();
+        this.preparo = new ArrayList<>();
     }
 
     public Receita(Receita origem) {
@@ -29,8 +31,8 @@ public class Receita {
         this.categoria = origem.categoria;
         this.tempoPreparo = origem.tempoPreparo;
         this.rendimento = origem.rendimento;
-        this.ingredientes = new ArrayList<>(origem.ingredientes);
-        this.preparo = new ArrayList<>(origem.preparo);
+        this.ingredientes = origem.ingredientes;
+        this.preparo = origem.preparo;
     }
 
     public String getNome() {
@@ -72,9 +74,6 @@ public class Receita {
     public void setRendimento(Rendimento rendimento) {
         this.rendimento = rendimento;
     }
-
-    public void setIngredientes(List<Ingrediente> ingredientes) {
-        this.ingredientes = ingredientes; }
 
     public void addIngredientes(List<Ingrediente> ingredientes) {
         this.ingredientes.addAll(ingredientes);

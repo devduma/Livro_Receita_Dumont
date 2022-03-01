@@ -2,14 +2,8 @@ package br.com.letscode.Receita.view;
 
 import br.com.letscode.Receita.controller.Catalogo;
 import br.com.letscode.Receita.domain.Receita;
-import br.com.letscode.Receita.domain.Rendimento;
-import br.com.letscode.Receita.domain.Ingrediente;
 import br.com.letscode.Receita.enums.Categoria;
-import br.com.letscode.Receita.enums.TipoRendimento;
-import br.com.letscode.Receita.enums.TipoMedida;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 
 public class CatalogoView {
@@ -26,11 +20,6 @@ public class CatalogoView {
             numReceitaAtual = 0;
             ative = null;
         }
-    }
-
-    public CatalogoView(){
-        controller = null;
-        ative = null;
     }
 
     private boolean showMenu() {
@@ -95,29 +84,6 @@ public class CatalogoView {
 
         Receita receita = informaReceita();
         if (receita != null) {
-            // lê informações de rendimento
-            Rendimento rendimento = informaRendimento();
-            receita.setRendimento(rendimento);
-
-            // Inclusão de ingredientes
-            String adiciona;
-            List<Ingrediente> ingredientes = new ArrayList<>();
-            do{
-                ingredientes.add(informaIngredientes());
-                adiciona = ConsoleUtils.getUserOption("Deseja adicionar um novo ingrediente?\nS - Sim   N - Não", "S", "N");
-            } while (adiciona.equalsIgnoreCase("S"));
-
-            receita.setIngredientes(ingredientes);
-
-            // Preparo
-            List<String> preparo = new ArrayList<>();
-            String linhaPreparo = ConsoleUtils.getUserInput("Preparo da receita.  Digite FIM para encerrar.");
-            do{
-                preparo.add(linhaPreparo);
-                linhaPreparo = ConsoleUtils.getUserInput("");
-            } while (!linhaPreparo.equalsIgnoreCase("FIM"));
-
-            receita.setPreparo(preparo);
 
             // Cria uma nova receita no catálogo e torna essa a ativa caso not null.
             Receita nova = new EditReceitaView(receita).edit();
@@ -154,95 +120,17 @@ public class CatalogoView {
             }
             else {
                 // Lê a categoria da receita
-                Categoria categoria = validaCategoria();
+                Categoria categoria = new EditReceitaView().validaCategoria();
 
                 // Tempo de preparo
-                boolean argumentoOK = false;
-                double tempoPreparo = 0d;
-
-                // lê tempo de preparo
-                while (!argumentoOK){
-                    String tempoPreparoStr = ConsoleUtils.getUserInput("Tempo de preparo (minutos)");
-                    try {
-                        tempoPreparo = Double.parseDouble(tempoPreparoStr);
-                        argumentoOK = true;
-                    }
-                    catch (NumberFormatException e) {
-                        System.out.println("Valor inválido");
-                    }
-                }
+                    double tempoPreparo = new EditReceitaView().validaTempoPreparo();
                 other = new Receita(nomeReceita, categoria, tempoPreparo);
             }
         }
         return other;
     }
 
-    public Categoria validaCategoria(){
-        System.out.println("Categoria da receita: ");
-        Categoria[] categorias = Categoria.values();
-        String[] options = new String[categorias.length];
-
-        for (int i = 0; i < categorias.length; i++) {
-            options[i] = categorias[i].getCategoria();
-            System.out.printf("%s - %s%n", categorias[i].getCategoria(), categorias[i].name());
-        }
-
-        String catgReceita = ConsoleUtils.getUserOption("%nEscolha a opção", options);
-        System.out.println("Categoria: " + categorias[buscaPosicaoCategoria(catgReceita,categorias)].name());
-        return categorias[buscaPosicaoCategoria(catgReceita, categorias)];
-    }
-
-    /** Trata informações de Rendimento: quantidades De e Até e unidade/tipo */
-    public Rendimento informaRendimento() {
-        int qdeDe = (int) validaQuantidade("Serve: De (quantidade)");
-
-        int qdeAte = (int) validaQuantidade("Até");
-
-        // Tipo Rendimento
-        System.out.println("Unidade Rendimento: ");
-        TipoRendimento[] tipos = TipoRendimento.values();
-        String[] options = new String[tipos.length];
-
-        for (int i = 0; i < tipos.length; i++) {
-            options[i] = String.valueOf(tipos[i].getTipo());
-            System.out.printf("%s - %s%n", tipos[i].getTipo(), tipos[i].name());
-        }
-
-        String tipo = ConsoleUtils.getUserOption("%nEscolha a opção", options);
-        int posicao = buscaPosicaoTipo(Integer.parseInt(tipo), tipos);
-        System.out.println("Tipo: " + tipos[posicao].name());
-
-
-        return new Rendimento(qdeDe, qdeAte, tipos[posicao]);
-    }
-
-    /** trata informações de Ingredientes: Nome, quantidade e unidade */
-    public Ingrediente informaIngredientes(){
-        String nomeIngrediente;
-        do{
-            nomeIngrediente = ConsoleUtils.getUserInput("Nome do Ingrediente");
-        } while (nomeIngrediente.isBlank());
-
-        double qdeIngrediente = validaQuantidade("Quantidade");
-
-        // Tipo Rendimento
-        System.out.println("Unidade Medida: ");
-        TipoMedida[] tipos = TipoMedida.values();
-        String[] options = new String[tipos.length];
-
-        for (int i = 0; i < tipos.length; i++) {
-            options[i] = String.valueOf(tipos[i].getMedida());
-            System.out.printf("%s - %s%n", tipos[i].getMedida(), tipos[i].name());
-        }
-
-        String tipo = ConsoleUtils.getUserOption("%nEscolha a opção", options);
-        int posicao = buscaPosicaoMedida(Integer.parseInt(tipo), tipos);
-        System.out.println("Medida: " + tipos[posicao].name());
-
-        return new Ingrediente(nomeIngrediente, qdeIngrediente, tipos[posicao]);
-    }
-
-    private void find() {
+        private void find() {
         //Capturar o nome da receita.
         String name = ConsoleUtils.getUserInput("Qual o nome da receita que deseja localizar?");
         //Procura no Catalogo a receita com o mesmo nome.
@@ -313,54 +201,5 @@ public class CatalogoView {
             new ReceitaView(ative).fullView(System.out);
             //Exibe o menu de opções.
         } while (showMenu());
-    }
-
-    private int buscaPosicaoCategoria(String idCategoria, Categoria[] categoria){
-        int posicao = -1;
-        for (int i = 0; i < Categoria.values().length; i++) {
-            if ((categoria[i].getCategoria()).equalsIgnoreCase(idCategoria)) {
-                posicao = i;
-                break;
-            }
-        }
-        return posicao;
-    }
-
-    private static int buscaPosicaoTipo(int idTipo, TipoRendimento[] tipo){
-        int posicao = -1;
-        for (int i = 0; i < TipoRendimento.values().length; i++) {
-            if (tipo[i].getTipo() == idTipo) {
-                posicao = i;
-                break;
-            }
-        }
-        return posicao;
-    }
-
-    private static int buscaPosicaoMedida(int idTipo, TipoMedida[] tipo) {
-        int posicao = -1;
-        for (int i = 0; i < TipoMedida.values().length; i++) {
-            if (tipo[i].getMedida() == idTipo) {
-                posicao = i;
-                break;
-            }
-        }
-        return posicao;
-    }
-
-    private static double validaQuantidade(String mensagem){
-        boolean argumentoOK = false;
-        double qde = 0;
-
-        while (!argumentoOK) {
-            String qdeStr = ConsoleUtils.getUserInput(mensagem);
-            try {
-                qde = Double.parseDouble(qdeStr);
-                argumentoOK = true;
-            } catch (NumberFormatException e) {
-                System.out.println("Valor inválido");
-            }
-        }
-        return qde;
     }
 }

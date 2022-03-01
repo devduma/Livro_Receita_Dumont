@@ -3,7 +3,7 @@ package br.com.letscode.Receita.view;
 import java.util.Scanner;
 
 public class ConsoleUtils {
-    private static final String INVALID_OPTION_MSG = "Opção inválida. Tente novamente!";
+    private static final String INVALID_OPTION_MSG = "Opção inválida. Tente novamente   !";
 
     public static void clear() {
         System.out.print("\033[H\033[2J");
